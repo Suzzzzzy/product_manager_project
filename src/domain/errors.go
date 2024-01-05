@@ -13,4 +13,6 @@ var (
 	ErrBadParamInput = errors.New("given Param is not valid")
 	// ErrUserNotFound will throw if the requested item is not exists
 	ErrUserNotFound = errors.New("requested User is not found")
+	// ErrUserConflict will throw if the user already exists
+	ErrUserConflict = errors.New("해당 휴대폰 번호로 가입된 계정이 이미 존재합니다.")
 )
