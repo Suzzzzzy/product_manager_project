@@ -5,7 +5,7 @@ import (
 	"errors"
 	"example.com/m/src/domain"
 	"example.com/m/src/domain/model"
-	"golang.org/x/crypto/bcrypt"
+	"example.com/m/src/utils"
 	"gorm.io/gorm"
 	"log"
 )
@@ -22,7 +22,7 @@ func NewUserUsecase(transactionRepo model.TransactionRepository, userRepo model.
 	}
 }
 
-func (u userUsecase) CreateUser(ctx context.Context, password, phoneNumber string) error {
+func (u userUsecase) SignUp(ctx context.Context, password, phoneNumber string) error {
 	// 가입내역 확인
 	alreadyUser, err := u.userRepo.GetByPhoneNum(ctx, phoneNumber)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -32,13 +32,13 @@ func (u userUsecase) CreateUser(ctx context.Context, password, phoneNumber strin
 		return domain.ErrUserConflict
 	}
 	// 비밀번호 해쉬
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
+	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		log.Printf("failed to GenerateFromPassword: %v", err)
 		return domain.ErrInternalServerError
 	}
 	user := &model.User{
-		Password:    string(hashedPassword),
+		Password:    hashedPassword,
 		PhoneNumber: phoneNumber,
 	}
 
@@ -48,4 +48,28 @@ func (u userUsecase) CreateUser(ctx context.Context, password, phoneNumber strin
 		return domain.ErrInternalServerError
 	}
 	return nil
+}
+
+func (u userUsecase) SignIn(ctx context.Context, inputPassword, phoneNumber string) (string, error) {
+	// 가입내역 확인
+	user, err := u.userRepo.GetByPhoneNum(ctx, phoneNumber)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", domain.ErrInternalServerError
+	}
+	if user == nil {
+		return "", domain.ErrUserNotFound
+	}
+	// 비밀번호 검증
+	res := utils.CheckPasswordHash(user.Password, inputPassword)
+	if !res {
+		return "", domain.ErrUnauthorized
+	}
+	// 토큰 발행
+	accessToken, err := utils.CreateJWT(user.PhoneNumber)
+	if err != nil {
+		log.Printf("failed to Generate AccessToken")
+		return "", domain.ErrInternalServerError
+	}
+
+	return accessToken, nil
 }

@@ -30,7 +30,7 @@ func NewMockDB(t *testing.T) (*gorm.DB, sqlmock.Sqlmock) {
 //	mock.ExpectQuery("INSERT INTO `users` (`created_at`,`updated_at`,`deleted_at`,`password`,`phone_number`) VALUES ('2024-01-04 17:50:05.32','2024-01-04 17:50:05.32',NULL,'','010-0000-0000')") //.WillReturnResult(sqlmock.NewResult(1, 1))
 //	mock.ExpectCommit()
 //	user := model.User{PhoneNumber: "010-0000-0000"}
-//	if err := repo.CreateUser(context.Background(), user); err != nil {
+//	if err := repo.SignUp(context.Background(), user); err != nil {
 //		t.Fatalf("Failed to insert user: %v", err)
 //	}
 //}
