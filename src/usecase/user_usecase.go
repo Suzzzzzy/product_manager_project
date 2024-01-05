@@ -62,10 +62,10 @@ func (u userUsecase) SignIn(ctx context.Context, inputPassword, phoneNumber stri
 	// 비밀번호 검증
 	res := utils.CheckPasswordHash(user.Password, inputPassword)
 	if !res {
-		return "", domain.ErrUnauthorized
+		return "", domain.ErrWrongPassword
 	}
 	// 토큰 발행
-	accessToken, err := utils.CreateJWT(user.PhoneNumber)
+	accessToken, err := utils.CreateJWT(user.PhoneNumber, user.ID)
 	if err != nil {
 		log.Printf("failed to Generate AccessToken")
 		return "", domain.ErrInternalServerError
