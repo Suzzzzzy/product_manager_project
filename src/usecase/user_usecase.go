@@ -29,7 +29,7 @@ func (u userUsecase) CreateUser(ctx context.Context, password, phoneNumber strin
 		return domain.ErrInternalServerError
 	}
 	if alreadyUser != nil {
-		return domain.ErrConflict
+		return domain.ErrUserConflict
 	}
 	// 비밀번호 해쉬
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 10)
