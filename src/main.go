@@ -1,21 +1,17 @@
 package main
 
 import (
-	"database/sql"
-	"fmt"
+	"example.com/m/src/adapter/http"
+	"example.com/m/src/repository"
+	"example.com/m/src/repository/mysql"
+	"example.com/m/src/usecase"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	ht "net/http"
 )
 
 func main() {
-	connection := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", "root", "root", "mysql", "3306", "product_manager_project")
-	_, err := sql.Open(`mysql`, connection)
-	if err != nil {
-		fmt.Println("DB connection failed:", err)
-		return
-	}
-	fmt.Println("DB connection success")
+	db := mysql.InitDB()
 
 	router := gin.Default()
 
@@ -23,7 +19,12 @@ func main() {
 		c.String(ht.StatusOK, "Hello, World!")
 	})
 
-	err = router.Run(":8080")
+	transactionRepo := repository.NewTransactionRepository(db)
+	userRepo := repository.NewUserRepository(db)
+	userUsecase := usecase.NewUserUsecase(transactionRepo, userRepo)
+	http.NewUserHandler(router, userUsecase)
+
+	err := router.Run(":8080")
 	if err != nil {
 		panic(err)
 	}

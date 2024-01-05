@@ -9,6 +9,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: product-manager-project
     volumes:
       - ./initdb.d:/docker-entrypoint-initdb.d
     ports:
