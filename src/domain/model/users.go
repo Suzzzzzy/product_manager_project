@@ -23,6 +23,8 @@ type UserRepository interface {
 }
 
 type UserUsecase interface {
-	// CreateUser 유저 정보 생성
-	CreateUser(ctx context.Context, password, phoneNumber string) error
+	// SignUp 회원가입
+	SignUp(ctx context.Context, password, phoneNumber string) error
+	// SignIn 로그인
+	SignIn(ctx context.Context, password, phoneNumber string) (accessToken string, err error)
 }

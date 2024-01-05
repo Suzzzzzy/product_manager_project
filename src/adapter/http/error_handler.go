@@ -24,6 +24,8 @@ func GetStatusCode(err error) int {
 		return http.StatusConflict
 	case domain.ErrUserConflict:
 		return http.StatusConflict
+	case domain.ErrUnauthorized:
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

@@ -12,6 +12,9 @@ import (
 
 func main() {
 	db := mysql.InitDB()
+	if db == nil {
+		panic(db)
+	}
 
 	router := gin.Default()
 

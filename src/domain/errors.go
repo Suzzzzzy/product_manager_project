@@ -12,7 +12,9 @@ var (
 	// ErrBadParamInput will throw if the given request-body or params is not valid
 	ErrBadParamInput = errors.New("given Param is not valid")
 	// ErrUserNotFound will throw if the requested item is not exists
-	ErrUserNotFound = errors.New("requested User is not found")
+	ErrUserNotFound = errors.New("존재하지 않는 회원 정보 입니다.")
 	// ErrUserConflict will throw if the user already exists
 	ErrUserConflict = errors.New("해당 휴대폰 번호로 가입된 계정이 이미 존재합니다.")
+	// ErrUnauthorized will throw if the account is not authorized
+	ErrUnauthorized = errors.New("비밀번호가 올바르지 않습니다.")
 )
