@@ -61,5 +61,5 @@ func (u *UserHandler) SignIn(c *gin.Context) {
 
 	c.SetCookie(cookie.Name, cookie.Value, cookie.MaxAge, cookie.Path, cookie.Domain, cookie.Secure, cookie.HttpOnly)
 
-	c.JSON(http.StatusOK, accessToken)
+	c.JSON(http.StatusOK, gin.H{"access token": accessToken})
 }
