@@ -1,10 +1,12 @@
 package http
 
 import (
+	"example.com/m/src/adapter/mapper"
 	"example.com/m/src/domain/model"
 	"example.com/m/src/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"time"
 )
 
 type ProductHandler struct {
@@ -22,26 +24,49 @@ func NewProductHandler(r *gin.Engine, u model.ProductUsecase) {
 	}
 }
 
-type productRequest struct {
-	Password    string `json:"password"`
-	PhoneNumber string `json:"phone_number"`
+type ProductRequest struct {
+	Category       string  `json:"category"`
+	Price          float32 `json:"price"`
+	Cost           float32 `json:"cost"`
+	Name           string  `json:"name"`
+	Description    string  `json:"description"`
+	Barcode        string  `json:"barcode"`
+	ExpirationDate string  `json:"expiration_date"`
+	Size           string  `json:"size"`
 }
 
-func (u *UserHandler) RegisterProduct(c *gin.Context) {
-	var req productRequest
+func (p *ProductHandler) RegisterProduct(c *gin.Context) {
+	var req ProductRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 	ctx := c.Request.Context()
-	userId, err := utils.GetClaimByUserId(ctx)
+	token := c.Request.Header.Get("Authorization")
+	// token 에서 유저정보 추출
+	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
 		c.JSON(GetStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
-	err := u.ProductUsecase.RegisterProduct(ctx, req.Password, req.PhoneNumber)
+	// 요청값 유효성 확인
+	paredTime, err := time.Parse("2006-01-02", req.ExpirationDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "유통기한 날짜 형식이 맞지 않습니다.(ex.2024-01-01)"})
+		return
+	}
+	if req.Size != model.Small && req.Size != model.Large {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "size 값이 유효하지 않습니다.(ex.small or large)"})
+		return
+	}
+	product := &model.Product{
+		Category: req.Category, Price: req.Price, Cost: req.Cost, Name: req.Name, Description: req.Description, Barcode: req.Barcode, ExpirationDate: paredTime, Size: req.Size, UserId: userId,
+	}
+	newProduct, err := p.ProductUsecase.RegisterProduct(ctx, product, userId)
 	if err != nil {
 		c.JSON(GetStatusCode(err), ResponseError{Message: err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, "Registration successful")
+	result := mapper.ToProductRes(newProduct)
+	c.JSON(http.StatusOK, result)
 }

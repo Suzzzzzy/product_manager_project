@@ -1,11 +1,9 @@
 package utils
 
 import (
-	"context"
 	"example.com/m/src/domain"
 	"github.com/golang-jwt/jwt"
 	goJwt "github.com/golang-jwt/jwt/v5"
-	"google.golang.org/grpc/metadata"
 	"strings"
 	"time"
 )
@@ -26,15 +24,12 @@ func CreateJWT(phoneNumber string, userId int) (string, error) {
 	return token, nil
 }
 
-func GetClaimByUserId(ctx context.Context) (int, error) {
-	md, _ := metadata.FromIncomingContext(ctx)
-	values := md["authorization"]
-
+func GetClaimByUserId(values string) (int, error) {
 	if len(values) == 0 {
 		return 0, domain.ErrRequiredAccessToken
 	}
 
-	accessToken := RemoveBearer(values[0])
+	accessToken := RemoveBearer(values)
 	token, _, err := new(goJwt.Parser).ParseUnverified(accessToken, goJwt.MapClaims{})
 	if err != nil {
 		return 0, domain.ErrInvalidAccessToken
@@ -42,7 +37,7 @@ func GetClaimByUserId(ctx context.Context) (int, error) {
 
 	var value int
 	if claims, ok := token.Claims.(goJwt.MapClaims); ok {
-		if userIDFloat, ok := claims["userId"].(float64); ok {
+		if userIDFloat, ok := claims["UserId"].(float64); ok {
 			value = int(userIDFloat)
 		}
 	}
