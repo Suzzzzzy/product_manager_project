@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"example.com/m/src/domain/model"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
@@ -32,8 +31,8 @@ func connectDB() *gorm.DB {
 	}
 	fmt.Println("DB connection success")
 
-	db.Migrator().DropTable(&model.User{})
-	db.AutoMigrate(&model.User{})
+	//db.Migrator().DropTable(&model.User{})
+	//db.AutoMigrate(&model.User{})
 
 	return db
 }

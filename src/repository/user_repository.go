@@ -28,3 +28,12 @@ func (u *userRepository) GetByPhoneNum(ctx context.Context, phoneNumber string) 
 	}
 	return user, nil
 }
+
+func (u *userRepository) GetByUserId(ctx context.Context, userId int) (*model.User, error) {
+	var user *model.User
+	err := u.db.WithContext(ctx).Where("id = ?", userId).First(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}

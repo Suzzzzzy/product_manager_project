@@ -27,6 +27,10 @@ func main() {
 	userUsecase := usecase.NewUserUsecase(transactionRepo, userRepo)
 	http.NewUserHandler(router, userUsecase)
 
+	productRepo := repository.NewProductRepository(db)
+	productUsecase := usecase.NewProductUsecase(transactionRepo, userRepo, productRepo)
+	http.NewProductHandler(router, productUsecase)
+
 	err := router.Run(":8080")
 	if err != nil {
 		panic(err)
