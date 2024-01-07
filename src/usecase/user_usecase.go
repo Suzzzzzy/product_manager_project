@@ -65,7 +65,7 @@ func (u userUsecase) SignIn(ctx context.Context, inputPassword, phoneNumber stri
 		return "", domain.ErrWrongPassword
 	}
 	// 토큰 발행
-	accessToken, err := utils.CreateJWT(user.PhoneNumber, int(user.ID))
+	accessToken, err := utils.CreateJWT(user.PhoneNumber, user.Id)
 	if err != nil {
 		log.Printf("failed to Generate AccessToken")
 		return "", domain.ErrInternalServerError

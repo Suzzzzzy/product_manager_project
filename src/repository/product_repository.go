@@ -45,3 +45,17 @@ func (p *productRepository) DeleteProduct(ctx context.Context, product *model.Pr
 	}
 	return nil
 }
+
+func (p *productRepository) GetProductList(ctx context.Context, userId, page int) ([]model.Product, error) {
+	var productList []model.Product
+	pageSize := 10
+	offset := (page - 1) * pageSize
+	err := p.db.WithContext(ctx).Where("user_id = ?", userId).Order("created_at desc").Offset(offset).Limit(pageSize).Find(&productList).Error
+	return productList, err
+}
+
+func (p *productRepository) GetTotalProductCount(ctx context.Context, userId int) (int, error) {
+	var count int64
+	err := p.db.WithContext(ctx).Model(&model.Product{}).Where("user_id = ?", userId).Count(&count).Error
+	return int(count), err
+}
