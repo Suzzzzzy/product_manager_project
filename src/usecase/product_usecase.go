@@ -123,3 +123,29 @@ func (p *productUsecase) DeleteProduct(ctx context.Context, productId, userId in
 	}
 	return nil
 }
+
+func (p *productUsecase) GetProductList(ctx context.Context, userId, page int) ([]model.Product, int, error) {
+	// 유저 검증
+	_, err := p.checkUserValid(ctx, userId)
+	if err != nil {
+		return nil, 0, err
+	}
+	// 페이지 정보 조회
+	totalProductCount, err := p.productRepo.GetTotalProductCount(ctx, userId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, 0, domain.ErrInternalServerError
+	}
+	if totalProductCount == 0 {
+		return nil, 0, nil
+	}
+	totalPage := totalProductCount / 10
+	if page > totalPage {
+		return nil, totalPage, nil
+	}
+	// 상품 리스트 조회
+	productList, err := p.productRepo.GetProductList(ctx, userId, page)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, 0, domain.ErrInternalServerError
+	}
+	return productList, totalPage, nil
+}

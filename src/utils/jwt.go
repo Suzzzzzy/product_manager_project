@@ -37,8 +37,8 @@ func GetClaimByUserId(values string) (int, error) {
 
 	var value int
 	if claims, ok := token.Claims.(goJwt.MapClaims); ok {
-		if userIDFloat, ok := claims["UserId"].(float64); ok {
-			value = int(userIDFloat)
+		if userIdFloat, ok := claims["UserId"].(float64); ok {
+			value = int(userIdFloat)
 		}
 	}
 	return value, nil

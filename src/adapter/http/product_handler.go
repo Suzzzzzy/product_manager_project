@@ -24,6 +24,7 @@ func NewProductHandler(r *gin.Engine, u model.ProductUsecase) {
 		router.GET("/:id", handler.GetProduct)
 		router.PUT("/:id", handler.UpdateProduct)
 		router.DELETE("/:id", handler.DeleteProduct)
+		router.GET("", handler.GetProductList)
 	}
 }
 
@@ -155,4 +156,48 @@ func (p *ProductHandler) DeleteProduct(c *gin.Context) {
 	}
 
 	JSONResponse(c, http.StatusOK, "ok", nil)
+}
+
+func (p *ProductHandler) GetProductList(c *gin.Context) {
+	ctx := c.Request.Context()
+	token := c.Request.Header.Get("Authorization")
+	// token 에서 유저정보 추출
+	userId, err := utils.GetClaimByUserId(token)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	var page int
+	if pageParam := c.Query("page"); pageParam != "" {
+		parsedPage, err := strconv.Atoi(pageParam)
+		if err != nil || parsedPage < 1 {
+			JSONResponse(c, http.StatusBadRequest, "유효하지 않은 페이지 번호 입니다.", nil)
+			return
+		}
+		page = parsedPage
+	}
+
+	productList, totalPage, err := p.ProductUsecase.GetProductList(ctx, userId, page)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	pageInfo := PageInfo{
+		CurrentPage: page,
+		TotalPage:   totalPage,
+	}
+	result := mapper.ToProductListRes(productList)
+
+	JSONResponse(c, http.StatusOK, "ok", struct {
+		Products []mapper.ProductListResponse `json:"products"`
+		PageInfo PageInfo                     `json:"page_info"`
+	}{
+		Products: result,
+		PageInfo: pageInfo,
+	})
+}
+
+type PageInfo struct {
+	CurrentPage int `json:"current_page"`
+	TotalPage   int `json:"total_page"`
 }

@@ -32,6 +32,7 @@ func (u *UserHandler) SignUp(c *gin.Context) {
 	var req authRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		JSONResponse(c, http.StatusBadRequest, err.Error(), nil)
+		return
 	}
 	ctx := c.Request.Context()
 	err := u.UserUsecase.SignUp(ctx, req.Password, req.PhoneNumber)
