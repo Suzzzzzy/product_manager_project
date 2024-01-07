@@ -50,6 +50,8 @@ type ProductRepository interface {
 	GetByProductId(ctx context.Context, productId int) (*Product, error)
 	// UpdateProduct 상품 정보 수정
 	UpdateProduct(ctx context.Context, product *Product, updateInfo map[string]interface{}) (*Product, error)
+	// DeleteProduct 상품 단일 삭제
+	DeleteProduct(ctx context.Context, product *Product) error
 }
 
 type ProductUsecase interface {
@@ -59,4 +61,6 @@ type ProductUsecase interface {
 	GetByProductId(ctx context.Context, productId, userId int) (*Product, error)
 	// UpdateProduct 상품 정보 수정
 	UpdateProduct(ctx context.Context, productId, userId int, updateInfo map[string]interface{}) (*Product, error)
+	// DeleteProduct 상품 단일 삭제
+	DeleteProduct(ctx context.Context, productId, userId int) error
 }

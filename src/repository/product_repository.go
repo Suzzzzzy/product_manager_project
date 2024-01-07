@@ -38,3 +38,10 @@ func (p *productRepository) UpdateProduct(ctx context.Context, product *model.Pr
 	}
 	return product, nil
 }
+
+func (p *productRepository) DeleteProduct(ctx context.Context, product *model.Product) error {
+	if err := p.db.WithContext(ctx).Delete(product).Error; err != nil {
+		return err
+	}
+	return nil
+}
