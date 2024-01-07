@@ -6,6 +6,7 @@ import (
 	"example.com/m/src/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -20,7 +21,7 @@ func NewProductHandler(r *gin.Engine, u model.ProductUsecase) {
 	router := r.Group("/products")
 	{
 		router.POST("", handler.RegisterProduct)
-
+		router.GET("/:id", handler.GetProduct)
 	}
 }
 
@@ -38,7 +39,7 @@ type ProductRequest struct {
 func (p *ProductHandler) RegisterProduct(c *gin.Context) {
 	var req ProductRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		JSONResponse(c, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	ctx := c.Request.Context()
@@ -46,17 +47,17 @@ func (p *ProductHandler) RegisterProduct(c *gin.Context) {
 	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
-		c.JSON(GetStatusCode(err), ResponseError{Message: err.Error()})
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
 	}
 	// 요청값 유효성 확인
 	paredTime, err := time.Parse("2006-01-02", req.ExpirationDate)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "유통기한 날짜 형식이 맞지 않습니다.(ex.2024-01-01)"})
+		JSONResponse(c, http.StatusBadRequest, "유통기한 날짜 형식이 맞지 않습니다.(ex.2024-01-01)", nil)
 		return
 	}
 	if req.Size != model.Small && req.Size != model.Large {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "size 값이 유효하지 않습니다.(ex.small or large)"})
+		JSONResponse(c, http.StatusBadRequest, "size 값이 유효하지 않습니다.(ex.small or large)", nil)
 		return
 	}
 	product := &model.Product{
@@ -64,9 +65,30 @@ func (p *ProductHandler) RegisterProduct(c *gin.Context) {
 	}
 	newProduct, err := p.ProductUsecase.RegisterProduct(ctx, product, userId)
 	if err != nil {
-		c.JSON(GetStatusCode(err), ResponseError{Message: err.Error()})
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
 	}
 	result := mapper.ToProductRes(newProduct)
-	c.JSON(http.StatusOK, result)
+	JSONResponse(c, http.StatusOK, "ok", result)
+}
+
+func (p *ProductHandler) GetProduct(c *gin.Context) {
+	productId, _ := strconv.Atoi(c.Param("id"))
+
+	ctx := c.Request.Context()
+	token := c.Request.Header.Get("Authorization")
+	// token 에서 유저정보 추출
+	userId, err := utils.GetClaimByUserId(token)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	product, err := p.ProductUsecase.GetByProductId(ctx, productId, userId)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	result := mapper.ToProductRes(product)
+
+	JSONResponse(c, http.StatusOK, "ok", result)
 }
