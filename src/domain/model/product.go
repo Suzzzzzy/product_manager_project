@@ -46,9 +46,13 @@ const (
 type ProductRepository interface {
 	// RegisterProduct 상품 등록
 	RegisterProduct(ctx context.Context, tx *gorm.DB, product *Product) (*Product, error)
+	// GetByProductId 상품 조회
+	GetByProductId(ctx context.Context, productId int) (*Product, error)
 }
 
 type ProductUsecase interface {
 	// RegisterProduct 상품 등록
 	RegisterProduct(ctx context.Context, product *Product, userId int) (*Product, error)
+	// GetByProductId 상품 단일 조회
+	GetByProductId(ctx context.Context, productId, userId int) (*Product, error)
 }

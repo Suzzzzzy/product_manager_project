@@ -22,7 +22,7 @@ func NewProductUsecase(transactionRepo model.TransactionRepository, userRepo mod
 	}
 }
 
-func (p productUsecase) RegisterProduct(ctx context.Context, product *model.Product, userId int) (*model.Product, error) {
+func (p *productUsecase) RegisterProduct(ctx context.Context, product *model.Product, userId int) (*model.Product, error) {
 	// 유저 검증
 	user, err := p.userRepo.GetByUserId(ctx, userId)
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
@@ -46,4 +46,27 @@ func (p productUsecase) RegisterProduct(ctx context.Context, product *model.Prod
 	}
 
 	return newProduct, nil
+}
+
+func (p *productUsecase) GetByProductId(ctx context.Context, productId, userId int) (*model.Product, error) {
+	// 유저 검증
+	user, err := p.userRepo.GetByUserId(ctx, userId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, domain.ErrInternalServerError
+	}
+	if user == nil {
+		return nil, domain.ErrUserNotFound
+	}
+	// 상품 검증
+	product, err := p.productRepo.GetByProductId(ctx, productId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, domain.ErrInternalServerError
+	}
+	if product == nil {
+		return nil, domain.ErrProductNotFound
+	}
+	if product.UserId != userId {
+		return nil, domain.ErrInvalidUser
+	}
+	return product, nil
 }
