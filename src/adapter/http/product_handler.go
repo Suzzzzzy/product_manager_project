@@ -23,6 +23,7 @@ func NewProductHandler(r *gin.Engine, u model.ProductUsecase) {
 		router.POST("", handler.RegisterProduct)
 		router.GET("/:id", handler.GetProduct)
 		router.PUT("/:id", handler.UpdateProduct)
+		router.DELETE("/:id", handler.DeleteProduct)
 	}
 }
 
@@ -134,4 +135,24 @@ func (p *ProductHandler) UpdateProduct(c *gin.Context) {
 	result := mapper.ToProductRes(updatedProduct)
 	JSONResponse(c, http.StatusOK, "ok", result)
 
+}
+
+func (p *ProductHandler) DeleteProduct(c *gin.Context) {
+	productId, _ := strconv.Atoi(c.Param("id"))
+
+	ctx := c.Request.Context()
+	token := c.Request.Header.Get("Authorization")
+	// token 에서 유저정보 추출
+	userId, err := utils.GetClaimByUserId(token)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	err = p.ProductUsecase.DeleteProduct(ctx, productId, userId)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+
+	JSONResponse(c, http.StatusOK, "ok", nil)
 }

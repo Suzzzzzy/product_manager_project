@@ -22,6 +22,33 @@ func NewProductUsecase(transactionRepo model.TransactionRepository, userRepo mod
 	}
 }
 
+// checkUserValid 유저의 유효성을 검증
+func (p *productUsecase) checkUserValid(ctx context.Context, userId int) (*model.User, error) {
+	user, err := p.userRepo.GetByUserId(ctx, userId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, domain.ErrInternalServerError
+	}
+	if user == nil {
+		return nil, domain.ErrUserNotFound
+	}
+	return user, nil
+}
+
+// checkProductValid 상품의 유효성을 검증
+func (p *productUsecase) checkProductValid(ctx context.Context, productId, userId int) (*model.Product, error) {
+	product, err := p.productRepo.GetByProductId(ctx, productId)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, domain.ErrInternalServerError
+	}
+	if product == nil {
+		return nil, domain.ErrProductNotFound
+	}
+	if product.UserId != userId {
+		return nil, domain.ErrInvalidUser
+	}
+	return product, nil
+}
+
 func (p *productUsecase) RegisterProduct(ctx context.Context, product *model.Product, userId int) (*model.Product, error) {
 	// 유저 검증
 	_, err := p.checkUserValid(ctx, userId)
@@ -78,29 +105,21 @@ func (p *productUsecase) UpdateProduct(ctx context.Context, productId, userId in
 	return updatedProduct, nil
 }
 
-// checkUserValid 유저의 유효성을 검증
-func (p *productUsecase) checkUserValid(ctx context.Context, userId int) (*model.User, error) {
-	user, err := p.userRepo.GetByUserId(ctx, userId)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, domain.ErrInternalServerError
+func (p *productUsecase) DeleteProduct(ctx context.Context, productId, userId int) error {
+	// 유저 검증
+	_, err := p.checkUserValid(ctx, userId)
+	if err != nil {
+		return err
 	}
-	if user == nil {
-		return nil, domain.ErrUserNotFound
+	// 상품 검증
+	product, err := p.checkProductValid(ctx, productId, userId)
+	if err != nil {
+		return err
 	}
-	return user, nil
-}
-
-// checkProductValid 상품의 유효성을 검증
-func (p *productUsecase) checkProductValid(ctx context.Context, productId, userId int) (*model.Product, error) {
-	product, err := p.productRepo.GetByProductId(ctx, productId)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, domain.ErrInternalServerError
+	// 상품 삭제
+	err = p.productRepo.DeleteProduct(ctx, product)
+	if err != nil {
+		return err
 	}
-	if product == nil {
-		return nil, domain.ErrProductNotFound
-	}
-	if product.UserId != userId {
-		return nil, domain.ErrInvalidUser
-	}
-	return product, nil
+	return nil
 }
