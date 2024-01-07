@@ -24,9 +24,16 @@ func (p *productRepository) RegisterProduct(ctx context.Context, tx *gorm.DB, pr
 }
 
 func (p *productRepository) GetByProductId(ctx context.Context, productId int) (*model.Product, error) {
-	var product *model.Product
+	var product model.Product
 	err := p.db.WithContext(ctx).Where("id = ?", productId).First(&product).Error
 	if err != nil {
+		return nil, err
+	}
+	return &product, nil
+}
+
+func (p *productRepository) UpdateProduct(ctx context.Context, product *model.Product, updateInfo map[string]interface{}) (*model.Product, error) {
+	if err := p.db.WithContext(ctx).Model(product).Updates(updateInfo).Error; err != nil {
 		return nil, err
 	}
 	return product, nil
