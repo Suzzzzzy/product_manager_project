@@ -48,6 +48,8 @@ type ProductRepository interface {
 	RegisterProduct(ctx context.Context, tx *gorm.DB, product *Product) (*Product, error)
 	// GetByProductId 상품 조회
 	GetByProductId(ctx context.Context, productId int) (*Product, error)
+	// UpdateProduct 상품 정보 수정
+	UpdateProduct(ctx context.Context, product *Product, updateInfo map[string]interface{}) (*Product, error)
 }
 
 type ProductUsecase interface {
@@ -55,4 +57,6 @@ type ProductUsecase interface {
 	RegisterProduct(ctx context.Context, product *Product, userId int) (*Product, error)
 	// GetByProductId 상품 단일 조회
 	GetByProductId(ctx context.Context, productId, userId int) (*Product, error)
+	// UpdateProduct 상품 정보 수정
+	UpdateProduct(ctx context.Context, productId, userId int, updateInfo map[string]interface{}) (*Product, error)
 }

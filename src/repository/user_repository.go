@@ -21,19 +21,19 @@ func (u *userRepository) CreateUser(ctx context.Context, tx *gorm.DB, user *mode
 }
 
 func (u *userRepository) GetByPhoneNum(ctx context.Context, phoneNumber string) (*model.User, error) {
-	var user *model.User
+	var user model.User
 	err := u.db.WithContext(ctx).Where("phone_number = ?", phoneNumber).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }
 
 func (u *userRepository) GetByUserId(ctx context.Context, userId int) (*model.User, error) {
-	var user *model.User
+	var user model.User
 	err := u.db.WithContext(ctx).Where("id = ?", userId).First(&user).Error
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+	return &user, nil
 }

@@ -22,6 +22,7 @@ func NewProductHandler(r *gin.Engine, u model.ProductUsecase) {
 	{
 		router.POST("", handler.RegisterProduct)
 		router.GET("/:id", handler.GetProduct)
+		router.PUT("/:id", handler.UpdateProduct)
 	}
 }
 
@@ -91,4 +92,46 @@ func (p *ProductHandler) GetProduct(c *gin.Context) {
 	result := mapper.ToProductRes(product)
 
 	JSONResponse(c, http.StatusOK, "ok", result)
+}
+
+func (p *ProductHandler) UpdateProduct(c *gin.Context) {
+	var updatedFields map[string]interface{}
+	if err := c.ShouldBindJSON(&updatedFields); err != nil {
+		JSONResponse(c, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	productId, _ := strconv.Atoi(c.Param("id"))
+
+	ctx := c.Request.Context()
+	token := c.Request.Header.Get("Authorization")
+	// token 에서 유저정보 추출
+	userId, err := utils.GetClaimByUserId(token)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	if _, ok := updatedFields["expiration_date"]; ok {
+		expirationDate := updatedFields["expiration_date"].(string)
+		_, err := time.Parse("2006-01-02", expirationDate)
+		if err != nil {
+			JSONResponse(c, http.StatusBadRequest, "유통기한 날짜 형식이 맞지 않습니다.(ex.2024-01-01)", nil)
+			return
+		}
+	}
+	if _, ok := updatedFields["size"]; ok {
+		size := updatedFields["size"].(string)
+		if size != model.Small && size != model.Large {
+			JSONResponse(c, http.StatusBadRequest, "size 값이 유효하지 않습니다.(ex.small or large)", nil)
+			return
+		}
+	}
+
+	updatedProduct, err := p.ProductUsecase.UpdateProduct(ctx, productId, userId, updatedFields)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	result := mapper.ToProductRes(updatedProduct)
+	JSONResponse(c, http.StatusOK, "ok", result)
+
 }
