@@ -48,7 +48,11 @@ func (p *ProductHandler) RegisterProduct(c *gin.Context) {
 		return
 	}
 	ctx := c.Request.Context()
-	token := c.Request.Header.Get("Authorization")
+	cookie, err := c.Request.Cookie("access-token")
+	if err != nil {
+		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
+	}
+	token := cookie.Value
 	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
@@ -81,8 +85,11 @@ func (p *ProductHandler) GetProduct(c *gin.Context) {
 	productId, _ := strconv.Atoi(c.Param("id"))
 
 	ctx := c.Request.Context()
-	token := c.Request.Header.Get("Authorization")
-	// token 에서 유저정보 추출
+	cookie, err := c.Request.Cookie("access-token")
+	if err != nil {
+		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
+	}
+	token := cookie.Value	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
@@ -107,8 +114,11 @@ func (p *ProductHandler) UpdateProduct(c *gin.Context) {
 	productId, _ := strconv.Atoi(c.Param("id"))
 
 	ctx := c.Request.Context()
-	token := c.Request.Header.Get("Authorization")
-	// token 에서 유저정보 추출
+	cookie, err := c.Request.Cookie("access-token")
+	if err != nil {
+		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
+	}
+	token := cookie.Value	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
@@ -144,8 +154,11 @@ func (p *ProductHandler) DeleteProduct(c *gin.Context) {
 	productId, _ := strconv.Atoi(c.Param("id"))
 
 	ctx := c.Request.Context()
-	token := c.Request.Header.Get("Authorization")
-	// token 에서 유저정보 추출
+	cookie, err := c.Request.Cookie("access-token")
+	if err != nil {
+		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
+	}
+	token := cookie.Value	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
@@ -167,8 +180,11 @@ func (p *ProductHandler) GetProductList(c *gin.Context) {
 	}
 
 	ctx := c.Request.Context()
-	token := c.Request.Header.Get("Authorization")
-	// token 에서 유저정보 추출
+	cookie, err := c.Request.Cookie("access-token")
+	if err != nil {
+		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
+	}
+	token := cookie.Value	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
@@ -208,8 +224,11 @@ func (p *ProductHandler) GetProductList(c *gin.Context) {
 
 func (p *ProductHandler) FindProductByName(c *gin.Context) {
 	ctx := c.Request.Context()
-	token := c.Request.Header.Get("Authorization")
-	// token 에서 유저정보 추출
+	cookie, err := c.Request.Cookie("access-token")
+	if err != nil {
+		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
+	}
+	token := cookie.Value	// token 에서 유저정보 추출
 	userId, err := utils.GetClaimByUserId(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
