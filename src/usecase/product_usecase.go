@@ -5,6 +5,7 @@ import (
 	"errors"
 	"example.com/m/src/domain"
 	"example.com/m/src/domain/model"
+	"example.com/m/src/utils"
 	"gorm.io/gorm"
 )
 
@@ -58,6 +59,10 @@ func (p *productUsecase) RegisterProduct(ctx context.Context, product *model.Pro
 
 	// 상품 정보 저장
 	var newProduct *model.Product
+
+	chosung := utils.ExtractChosung(product.Name)
+	product.NameChosung = chosung
+
 	if txErr := p.transactionRepo.Transaction(func(tx *gorm.DB) error {
 		createdProduct, err := p.productRepo.RegisterProduct(ctx, tx, product)
 		if err != nil {
@@ -148,4 +153,19 @@ func (p *productUsecase) GetProductList(ctx context.Context, userId, page int) (
 		return nil, 0, domain.ErrInternalServerError
 	}
 	return productList, totalPage, nil
+}
+
+
+func (p *productUsecase) FindProductByName(ctx context.Context, userId int, keyword string) ([]model.Product, error) {
+	// 유저 검증
+	_, err := p.checkUserValid(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+	// 상품 검색 조회
+	productList, err := p.productRepo.FindProductByName(ctx, userId, keyword)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, domain.ErrInternalServerError
+	}
+	return productList, nil
 }

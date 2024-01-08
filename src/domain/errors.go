@@ -27,4 +27,6 @@ var (
 	ErrProductNotFound = errors.New("존재하지 않는 상품 입니다.")
 	// ErrInvalidUser will throw if the user can't access the product
 	ErrInvalidUser = errors.New("해당 상품에 접근할 수 없습니다.")
+	// ErrBadKeywordInput will throw if the keyword is not valid
+	ErrBadKeywordInput = errors.New("검색 키워드를 입력해주세요.")
 )

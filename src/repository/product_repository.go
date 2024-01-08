@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"example.com/m/src/domain/model"
+	"fmt"
 	"gorm.io/gorm"
 )
 
@@ -58,4 +59,15 @@ func (p *productRepository) GetTotalProductCount(ctx context.Context, userId int
 	var count int64
 	err := p.db.WithContext(ctx).Model(&model.Product{}).Where("user_id = ?", userId).Count(&count).Error
 	return int(count), err
+}
+
+
+func (p *productRepository) FindProductByName(ctx context.Context, userId int, keyword string) ([]model.Product, error) {
+	var productList []model.Product
+	searchTerm := fmt.Sprintf("%%%s%%", keyword)
+
+	err := p.db.WithContext(ctx).Where("user_id = ?", userId).
+		Where("name LIKE ? or name_chosung LIKE ?", searchTerm, searchTerm).Order("created_at desc").Find(&productList).Error
+	return productList, err
+
 }

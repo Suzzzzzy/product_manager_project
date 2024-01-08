@@ -28,6 +28,8 @@ type Product struct {
 	Size string `gorm:"column:size;type:VARCHAR NOT NULL;" json:"size"`
 	// 상품을 등록한 유저의 고유값
 	UserId int `gorm:"column:user_id;type:INT8 NOT NULL;" json:"user_id"`
+	// 상품 이름의 초성
+	NameChosung string `gorm:"column:name_chosung;type:VARCHAR;" json:"name_chosung"`
 
 	CreatedAt time.Time      `gorm:"column:created_at;type:TIMESTAMPTZ;default:CURRENT_TIMESTAMP;"`
 	UpdatedAt time.Time      `gorm:"column:updated_at;type:TIMESTAMPTZ;default:CURRENT_TIMESTAMP;"`
@@ -56,6 +58,8 @@ type ProductRepository interface {
 	GetProductList(ctx context.Context, userId, page int) ([]Product, error)
 	// GetTotalProductCount 등록된 상품 전체 개수 조회
 	GetTotalProductCount(ctx context.Context, userId int) (int, error)
+	// FindProductByName 상품 이름으로 검색 조회
+	FindProductByName(ctx context.Context, userId int, keyword string) ([]Product, error)
 }
 
 type ProductUsecase interface {
@@ -69,4 +73,6 @@ type ProductUsecase interface {
 	DeleteProduct(ctx context.Context, productId, userId int) error
 	// GetProductList 상품 리스트 조회
 	GetProductList(ctx context.Context, userId, page int) (productList []Product, totalPage int, err error)
+	// FindProductByName 상품 이름으로 검색 조회
+	FindProductByName(ctx context.Context, userId int, keyword string) ([]Product, error)
 }
