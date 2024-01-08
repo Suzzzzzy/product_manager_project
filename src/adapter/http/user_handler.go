@@ -19,7 +19,7 @@ func NewUserHandler(r *gin.Engine, u model.UserUsecase) {
 	{
 		router.POST("/signup", handler.SignUp)
 		router.POST("/signin", handler.SignIn)
-		router.POST("/signout")
+		router.POST("/signout", handler.SignOut)
 	}
 }
 
@@ -63,4 +63,8 @@ func (u *UserHandler) SignIn(c *gin.Context) {
 	c.SetCookie(cookie.Name, cookie.Value, cookie.MaxAge, cookie.Path, cookie.Domain, cookie.Secure, cookie.HttpOnly)
 
 	JSONResponse(c, http.StatusOK, "로그인에 성공했습니다.", gin.H{"access token": accessToken})
+}
+
+func (U *UserHandler) SignOut(c *gin.Context) {
+
 }
