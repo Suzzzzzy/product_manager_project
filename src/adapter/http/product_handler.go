@@ -54,7 +54,7 @@ func (p *ProductHandler) RegisterProduct(c *gin.Context) {
 	}
 	token := cookie.Value
 	// token 에서 유저정보 추출
-	userId, err := utils.GetClaimByUserId(token)
+	userId, err := utils.VerifyToken(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
@@ -90,7 +90,7 @@ func (p *ProductHandler) GetProduct(c *gin.Context) {
 		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
 	}
 	token := cookie.Value	// token 에서 유저정보 추출
-	userId, err := utils.GetClaimByUserId(token)
+	userId, err := utils.VerifyToken(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
@@ -119,7 +119,7 @@ func (p *ProductHandler) UpdateProduct(c *gin.Context) {
 		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
 	}
 	token := cookie.Value	// token 에서 유저정보 추출
-	userId, err := utils.GetClaimByUserId(token)
+	userId, err := utils.VerifyToken(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
@@ -159,7 +159,7 @@ func (p *ProductHandler) DeleteProduct(c *gin.Context) {
 		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
 	}
 	token := cookie.Value	// token 에서 유저정보 추출
-	userId, err := utils.GetClaimByUserId(token)
+	userId, err := utils.VerifyToken(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
@@ -185,7 +185,7 @@ func (p *ProductHandler) GetProductList(c *gin.Context) {
 		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
 	}
 	token := cookie.Value	// token 에서 유저정보 추출
-	userId, err := utils.GetClaimByUserId(token)
+	userId, err := utils.VerifyToken(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
@@ -229,7 +229,7 @@ func (p *ProductHandler) FindProductByName(c *gin.Context) {
 		JSONResponse(c, http.StatusUnauthorized, domain.ErrRequiredAccessToken.Error(), nil)
 	}
 	token := cookie.Value	// token 에서 유저정보 추출
-	userId, err := utils.GetClaimByUserId(token)
+	userId, err := utils.VerifyToken(token)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
