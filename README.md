@@ -95,8 +95,3 @@ https://documenter.getpostman.com/view/19629582/2s9YsJCD8c
 - 데이터를 Mocking하여 가상의 데이터를 생성하고 비지니스 로직이 잘 작동하는지 확인합니다.
 - `mockery`: 명령어를 사용하여 특정 인터페이스(repository_interface)에 대한 mock을 자동으로 생성합니다.
 - `testify`: Go언어 테스트 라이브러리로, suite 패키지를 사용하여 여러가지의 테스트 케이스를 그룹화하였습니다.
-
-usecase 테스트를 실행하고, coverage를 출력하는 명령어는 아래와 같습니다.
-```bash
-make td-usecase
-```
