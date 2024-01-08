@@ -41,6 +41,7 @@ func (ts *UserUsecaseTestSuite) Test_SignUp() {
 		ts.NoError(result)
 	})
 	ts.Run("회원가입 실패 - 이미 가입한 회원 정보", func() {
+		ts.SetupTest()
 		ts.mockUserRepo.On("GetByPhoneNum", mock.Anything, mock.Anything).Return(&model.User{Id: 1}, nil)
 		ts.mockUserRepo.On("CreateUser", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		ts.mockTransactionRepo.On("Transaction", mock.Anything, mock.Anything).Return(nil)

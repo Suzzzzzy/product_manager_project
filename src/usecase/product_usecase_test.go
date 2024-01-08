@@ -65,6 +65,7 @@ func (ts *ProductUsecaseTestSuite) Test_GetByProductId() {
 		ts.Equal("붕어빵", result.Name)
 	})
 	ts.Run("상품 조회 실패 - 상품 접근 권한 없음",func() {
+		ts.SetupTest()
 		ts.mockUserRepo.On("GetByUserId", mock.Anything, mock.Anything).Return(&model.User{Id: 2}, nil)
 		ts.mockProductRepo.On("GetByProductId", mock.Anything, mock.Anything).Return(product, nil)
 
@@ -109,6 +110,7 @@ func (ts *ProductUsecaseTestSuite) Test_DeleteProduct() {
 		ts.NoError(err)
 	})
 	ts.Run("상품 삭제 실패 - 없는 상품", func() {
+		ts.SetupTest()
 		ts.mockUserRepo.On("GetByUserId", mock.Anything, mock.Anything).Return(&model.User{Id: 1}, nil)
 		ts.mockProductRepo.On("GetByProductId", mock.Anything, mock.Anything).Return(nil,  gorm.ErrRecordNotFound)
 		ts.mockProductRepo.On("DeleteProduct", mock.Anything, mock.Anything).Return(nil)
