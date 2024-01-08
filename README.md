@@ -71,13 +71,18 @@ ad-server-project
 git clone https://github.com/Suzzzzzy/product_manager_project.git
 ```
 
-서버를 실행합니다.
+DB를 세팅합니다.
 ```bash
-make up
+docker-compose up
 ```
-- 해당 명령어를 실행 하면, 프로젝트 이미지를 build 하여 docker-compose 로 띄우게 됩니다.
-- MySQL 데이터베이스를 완전하게 띄운 후에 서버를 실행하도록 했습니다.
 - 데이터베이스를 docker-compose 로 구성하면서, 필요한 리소스 데이터를 initdb sql 파일을 이용하여 import 합니다.
+```bash
+cd src
+go run main.go
+```
+- 소스코드 폴더로 이동합니다.
+- Go 프로그램을 실행합니다.
+- docker-compose로 띄운 mysql에 연결되며 프로그램이 실행됩니다.
 
 http://localhost:8080/ 혹은 http://0.0.0.0:8080/ 접속했을 때, "Hello world"가 출력된다면 서버가 정상적으로 실행된 것입니다.
 
@@ -90,8 +95,3 @@ https://documenter.getpostman.com/view/19629582/2s9YsJCD8c
 - 데이터를 Mocking하여 가상의 데이터를 생성하고 비지니스 로직이 잘 작동하는지 확인합니다.
 - `mockery`: 명령어를 사용하여 특정 인터페이스(repository_interface)에 대한 mock을 자동으로 생성합니다.
 - `testify`: Go언어 테스트 라이브러리로, suite 패키지를 사용하여 여러가지의 테스트 케이스를 그룹화하였습니다.
-
-usecase 테스트를 실행하고, coverage를 출력하는 명령어는 아래와 같습니다.
-```bash
-make td-usecase
-```
