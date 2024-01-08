@@ -1,7 +1,9 @@
 package http
 
 import (
+	"example.com/m/src/domain"
 	"example.com/m/src/domain/model"
+	"example.com/m/src/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -35,6 +37,10 @@ func (u *UserHandler) SignUp(c *gin.Context) {
 		return
 	}
 	ctx := c.Request.Context()
+	if !utils.IsValidPhoneNumber(req.Password) {
+		JSONResponse(c, http.StatusBadRequest, domain.ErrBadPhoneNumber.Error(), nil)
+		return
+	}
 	err := u.UserUsecase.SignUp(ctx, req.Password, req.PhoneNumber)
 	if err != nil {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)

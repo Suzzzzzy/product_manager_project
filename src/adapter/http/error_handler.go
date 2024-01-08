@@ -29,7 +29,7 @@ func GetStatusCode(err error) int {
 		return http.StatusNotFound
 	case domain.ErrConflict, domain.ErrUserConflict:
 		return http.StatusConflict
-	case domain.ErrWrongPassword, domain.ErrInvalidAccessToken, domain.ErrRequiredAccessToken:
+	case domain.ErrWrongPassword, domain.ErrInvalidAccessToken, domain.ErrRequiredAccessToken, domain.ErrExpiredToken:
 		return http.StatusUnauthorized
 	case domain.ErrInvalidUser:
 		return http.StatusForbidden
