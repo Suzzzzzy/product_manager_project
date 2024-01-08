@@ -2,6 +2,7 @@ package http
 
 import (
 	"example.com/m/src/adapter/mapper"
+	"example.com/m/src/domain"
 	"example.com/m/src/domain/model"
 	"example.com/m/src/utils"
 	"github.com/gin-gonic/gin"
@@ -25,6 +26,7 @@ func NewProductHandler(r *gin.Engine, u model.ProductUsecase) {
 		router.PUT("/:id", handler.UpdateProduct)
 		router.DELETE("/:id", handler.DeleteProduct)
 		router.GET("", handler.GetProductList)
+		router.GET("/search", handler.FindProductByName)
 	}
 }
 
@@ -159,6 +161,11 @@ func (p *ProductHandler) DeleteProduct(c *gin.Context) {
 }
 
 func (p *ProductHandler) GetProductList(c *gin.Context) {
+	type PageInfo struct {
+		CurrentPage int `json:"current_page"`
+		TotalPage   int `json:"total_page"`
+	}
+
 	ctx := c.Request.Context()
 	token := c.Request.Header.Get("Authorization")
 	// token 에서 유저정보 추출
@@ -182,6 +189,7 @@ func (p *ProductHandler) GetProductList(c *gin.Context) {
 		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
 		return
 	}
+
 	pageInfo := PageInfo{
 		CurrentPage: page,
 		TotalPage:   totalPage,
@@ -197,7 +205,28 @@ func (p *ProductHandler) GetProductList(c *gin.Context) {
 	})
 }
 
-type PageInfo struct {
-	CurrentPage int `json:"current_page"`
-	TotalPage   int `json:"total_page"`
+
+func (p *ProductHandler) FindProductByName(c *gin.Context) {
+	ctx := c.Request.Context()
+	token := c.Request.Header.Get("Authorization")
+	// token 에서 유저정보 추출
+	userId, err := utils.GetClaimByUserId(token)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+
+	keyword := c.Query("name")
+	if keyword == ""{
+		JSONResponse(c, http.StatusBadRequest, domain.ErrBadKeywordInput.Error(), nil)
+		return
+	}
+	productList, err := p.ProductUsecase.FindProductByName(ctx, userId, keyword)
+	if err != nil {
+		JSONResponse(c, GetStatusCode(err), err.Error(), nil)
+		return
+	}
+	result := mapper.ToProductListRes(productList)
+	JSONResponse(c, http.StatusOK, "ok", result)
+
 }

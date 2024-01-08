@@ -24,6 +24,7 @@ CREATE TABLE `product` (
                            `expiration_date` datetime NOT NULL,
                            `size` varchar(100) NOT NULL,
                            `user_id` int(11) NOT NULL,
+                           `name_chosung` varchar(255) DEFAULT NULL,
                            `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
                            `updated_at` datetime DEFAULT CURRENT_TIMESTAMP,
                            `deleted_at` datetime DEFAULT NULL,
