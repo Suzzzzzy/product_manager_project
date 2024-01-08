@@ -17,6 +17,8 @@ var (
 	ErrUserNotFound = errors.New("존재하지 않는 회원 정보 입니다.")
 	// ErrUserConflict will throw if the user already exists
 	ErrUserConflict = errors.New("해당 휴대폰 번호로 가입된 계정이 이미 존재합니다.")
+	// ErrBadPhoneNumber will throw if the phone number is not vvalid
+	ErrBadPhoneNumber = errors.New("휴대폰 번호를 다시 입력해주세요.(ex. 010-0000-0000)")
 	// ErrWrongPassword will throw if the account is not authenticated
 	ErrWrongPassword = errors.New("비밀번호가 올바르지 않습니다.")
 	// ErrInvalidAccessToken will throw if the access token is not authorized
