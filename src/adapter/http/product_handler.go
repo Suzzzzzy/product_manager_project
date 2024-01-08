@@ -227,6 +227,10 @@ func (p *ProductHandler) FindProductByName(c *gin.Context) {
 		return
 	}
 	result := mapper.ToProductListRes(productList)
-	JSONResponse(c, http.StatusOK, "ok", result)
+	JSONResponse(c, http.StatusOK, "ok", struct {
+		Products []mapper.ProductListResponse `json:"products"`
+	}{
+		Products: result,
+	})
 
 }
