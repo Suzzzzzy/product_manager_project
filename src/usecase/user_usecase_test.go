@@ -13,7 +13,7 @@ import (
 
 type UserUsecaseTestSuite struct {
 	suite.Suite
-	userUsecase     *userUsecase
+	userUsecase         *userUsecase
 	mockUserRepo        *mocks.UserRepository
 	mockTransactionRepo *mocks.TransactionRepository
 }
@@ -23,7 +23,7 @@ func (ts *UserUsecaseTestSuite) SetupTest() {
 	ts.mockTransactionRepo = new(mocks.TransactionRepository)
 	ts.userUsecase = &userUsecase{
 		transactionRepo: ts.mockTransactionRepo,
-		userRepo: ts.mockUserRepo,
+		userRepo:        ts.mockUserRepo,
 	}
 }
 
@@ -41,6 +41,7 @@ func (ts *UserUsecaseTestSuite) Test_SignUp() {
 		ts.NoError(result)
 	})
 	ts.Run("회원가입 실패 - 이미 가입한 회원 정보", func() {
+		ts.SetupTest()
 		ts.mockUserRepo.On("GetByPhoneNum", mock.Anything, mock.Anything).Return(&model.User{Id: 1}, nil)
 		ts.mockUserRepo.On("CreateUser", mock.Anything, mock.Anything, mock.Anything).Return(nil)
 		ts.mockTransactionRepo.On("Transaction", mock.Anything, mock.Anything).Return(nil)
@@ -63,7 +64,7 @@ func (ts *UserUsecaseTestSuite) Test_SignIn() {
 	ts.Run("로그인 실패 - 잘못된 비밀번호", func() {
 		ts.mockUserRepo.On("GetByPhoneNum", mock.Anything, mock.Anything).Return(&model.User{Id: 1, Password: hashedPassword}, nil)
 
-		_, err:= ts.userUsecase.SignIn(context.Background(), "12345", "010-0000-0000")
+		_, err := ts.userUsecase.SignIn(context.Background(), "12345", "010-0000-0000")
 		ts.Equal(domain.ErrWrongPassword, err)
 	})
 }
