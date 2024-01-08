@@ -23,6 +23,8 @@ var (
 	ErrInvalidAccessToken = errors.New("토큰이 올바르지 않습니다.")
 	// ErrRequiredAccessToken will throw if the access token is required
 	ErrRequiredAccessToken = errors.New("토큰이 필요합니다.")
+	// ErrExpiredToken will throw if the access token is expired
+	ErrExpiredToken = errors.New("토큰이 만료되었습니다.")
 	// ErrProductNotFound will throw if the product is not exists
 	ErrProductNotFound = errors.New("존재하지 않는 상품 입니다.")
 	// ErrInvalidUser will throw if the user can't access the product

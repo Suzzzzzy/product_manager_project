@@ -3,13 +3,12 @@ package utils
 import (
 	"example.com/m/src/domain"
 	"github.com/golang-jwt/jwt"
-	goJwt "github.com/golang-jwt/jwt/v5"
-	"strings"
 	"time"
 )
 
+var	mySigningKey = []byte("example")
+
 func CreateJWT(phoneNumber string, userId int) (string, error) {
-	mySigningKey := []byte("example")
 
 	aToken := jwt.New(jwt.SigningMethodHS256)
 	claims := aToken.Claims.(jwt.MapClaims)
@@ -24,29 +23,28 @@ func CreateJWT(phoneNumber string, userId int) (string, error) {
 	return token, nil
 }
 
-func GetClaimByUserId(values string) (int, error) {
+func VerifyToken(values string) (int, error) {
 	if len(values) == 0 {
 		return 0, domain.ErrRequiredAccessToken
 	}
 
-	accessToken := RemoveBearer(values)
-	token, _, err := new(goJwt.Parser).ParseUnverified(accessToken, goJwt.MapClaims{})
+	token, err := jwt.Parse(values, func(token *jwt.Token) (interface{}, error) {
+		return mySigningKey, nil
+	})
 	if err != nil {
-		return 0, domain.ErrInvalidAccessToken
+		switch err.(*jwt.ValidationError).Errors {
+		case jwt.ValidationErrorExpired:
+			return 0, domain.ErrExpiredToken
+		default:
+			return 0, domain.ErrInvalidAccessToken
+		}
 	}
 
 	var value int
-	if claims, ok := token.Claims.(goJwt.MapClaims); ok {
+	if claims, ok := token.Claims.(jwt.MapClaims); ok {
 		if userIdFloat, ok := claims["UserId"].(float64); ok {
 			value = int(userIdFloat)
 		}
 	}
 	return value, nil
-}
-
-// RemoveBearer token 에서 Bearer 제거
-func RemoveBearer(accessToken string) string {
-	removeBearer := strings.ReplaceAll(accessToken, "Bearer ", "")
-	removeBearer = strings.ReplaceAll(removeBearer, "bearer ", "")
-	return removeBearer
 }
