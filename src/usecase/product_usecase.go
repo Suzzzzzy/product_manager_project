@@ -144,6 +144,9 @@ func (p *productUsecase) GetProductList(ctx context.Context, userId, page int) (
 		return nil, 0, nil
 	}
 	totalPage := totalProductCount / 10
+	if totalProductCount % 10 != 0 {
+		totalPage++
+	}
 	if page > totalPage {
 		return nil, totalPage, nil
 	}

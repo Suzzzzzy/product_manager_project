@@ -37,7 +37,7 @@ func (u *UserHandler) SignUp(c *gin.Context) {
 		return
 	}
 	ctx := c.Request.Context()
-	if !utils.IsValidPhoneNumber(req.Password) {
+	if !utils.IsValidPhoneNumber(req.PhoneNumber) {
 		JSONResponse(c, http.StatusBadRequest, domain.ErrBadPhoneNumber.Error(), nil)
 		return
 	}

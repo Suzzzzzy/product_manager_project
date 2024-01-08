@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -10,7 +9,7 @@ import (
 const DB_USERNAME = "root"
 const DB_PASSWORD = "root"
 const DB_NAME = "product-manager-project"
-const DB_HOST = "127.0.0.1"
+const DB_HOST = "localhost"
 const DB_PORT = "3306"
 
 var DB *gorm.DB
