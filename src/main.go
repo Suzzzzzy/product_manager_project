@@ -1,13 +1,18 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"example.com/m/src/adapter/http"
 	"example.com/m/src/repository"
 	"example.com/m/src/repository/mysql"
 	"example.com/m/src/usecase"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 	ht "net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 )
 
 func main() {
@@ -31,8 +36,31 @@ func main() {
 	productUsecase := usecase.NewProductUsecase(transactionRepo, userRepo, productRepo)
 	http.NewProductHandler(router, productUsecase)
 
-	err := router.Run(":8080")
-	if err != nil {
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	server := &ht.Server{
+		Addr:    ":8080",
+		Handler: router,
+	}
+
+	go func() {
+		if err := server.ListenAndServe(); err != nil && !errors.Is(err, ht.ErrServerClosed) {
+			panic(err)
+		}
+	}()
+
+	<-stop
+	println("\nShutting down gracefully...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
 		panic(err)
 	}
+
+	//todo db close 추가
+
+	println("Shutdown complete")
 }
