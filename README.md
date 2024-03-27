@@ -7,7 +7,7 @@
 ## 개발
 - 개발 언어: Golang:1.20
 - web 프레임워크: [Gin](https://github.com/gin-gonic/gin)
-- gORM
+- GORM
 - docker-compose:3.8
 
 ## 폴더 구조
